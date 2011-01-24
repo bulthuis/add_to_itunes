@@ -1,3 +1,4 @@
-original_videos_path:   
-converted_videos_path:  
-add_to_itunes_path:     
+original_videos_path:   "/Path/to/Videos/"
+converted_videos_path:  "/Path/to/Videos/Converted/"
+discard_path:           "/Path/to/Videos/Deleted/"
+add_to_itunes_path:     "/Path/to/iTunes/iTunes Media/Automatically Add to iTunes/"

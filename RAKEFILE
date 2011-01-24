@@ -1,3 +1,5 @@
+require 'yaml'
+
 task :default => 'videos:convert'
 
 CONFIG = YAML.load_file('config.yml')
@@ -5,6 +7,7 @@ CONFIG = YAML.load_file('config.yml')
 ORIGINAL_VIDEOS_PATH = CONFIG['original_videos_path']
 CONVERTED_VIDEOS_PATH = CONFIG['converted_videos_path']
 ADD_TO_ITUNES_PATH = CONFIG['add_to_itunes_path']
+DISCARD_PATH = CONFIG['discard_path']
 
 directory CONVERTED_VIDEOS_PATH
 directory ADD_TO_ITUNES_PATH
@@ -14,10 +17,11 @@ namespace :videos do
 	desc 'Convert video files to iTunes format and move them to iTunes'
 	task :convert => CONVERTED_VIDEOS_PATH do
 		
-		FileList[ORIGINAL_VIDEOS_PATH + '*'].each do |video|
-			sh 'HandBrakeCLI -i ' + video + 
-				' -o ' + CONVERTED_VIDEOS_PATH + video.pathmap('%n') +
-				'.mp4 --preset="AppleTV"'
+		FileList[ORIGINAL_VIDEOS_PATH + '*.avi', ORIGINAL_VIDEOS_PATH + '*.mkv'].each do |video|
+			sh 'HandBrakeCLI -i "' + video + 
+				'" -o "' + CONVERTED_VIDEOS_PATH + video.pathmap('%n') +
+				'.mp4" --preset="AppleTV"'
+			mv(video, DISCARD_PATH)
 			Rake::Task['videos:move'].invoke
 		end
 
@@ -27,7 +31,7 @@ namespace :videos do
 	task :move => ADD_TO_ITUNES_PATH do
 		
 		FileList[CONVERTED_VIDEOS_PATH + '*'].each do |video|
-			mv(video, ADD_TO_ITUNES_PATH + video.pathmap('%f'))
+			mv(video, ADD_TO_ITUNES_PATH)
 		end
 		
 	end
